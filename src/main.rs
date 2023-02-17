@@ -23,8 +23,8 @@ fn add_vec3_optimized(u: &Vec3Optimized, v: &Vec3Optimized, result: &mut Vec3Opt
     result.register = unsafe {_mm_add_ps(u.register, v.register)};
 }
 
-fn add_float(a: __m128, b: __m128) ->__m128 {
-    return unsafe {_mm_add_ps(a, b)};
+fn add_float(a: &__m128, b: &__m128) ->__m128 {
+    return unsafe {_mm_add_ps(*a, *b)};
 }
 
 fn main() {
@@ -55,5 +55,5 @@ fn main() {
     // Normal vectors benchmark
     microbench::bench(&options, "add Vec3 optimized", || add_vec3_optimized(&a, &b, &mut add_result_optimized));
 
-    microbench::bench(&options, "add pure floats in __m128", || add_float(a_reg, b_reg));
+    microbench::bench(&options, "add pure floats in __m128", || add_float(&a_reg, &b_reg));
 }
