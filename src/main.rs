@@ -23,8 +23,9 @@ fn add_vec3_optimized(u: &Vec3Optimized, v: &Vec3Optimized, result: &mut Vec3Opt
     result.register = unsafe {_mm_add_ps(u.register, v.register)};
 }
 
-fn add_float(a: &__m128, b: &__m128) ->__m128 {
-    return unsafe {_mm_add_ps(*a, *b)};
+// Taken from slides as a reference point
+fn add_float(a: &__m128, b: &__m128, mut result: __m128){
+    result = unsafe {_mm_add_ps(*a, *b)};
 }
 
 fn main() {
@@ -44,6 +45,7 @@ fn main() {
 
     let a_reg = unsafe {_mm_set_ps(0.0, 3.0, 2.0, 1.0)};
     let b_reg = unsafe {_mm_set_ps(0.0, 6.0, 5.0, 4.0)};
+    let result_reg = unsafe {_mm_set_ps(0.0, 0.0, 0.0, 0.0)};
 
     // Optimized vectors. Data represented as f32x4 in a _m128, where only the first 3 floats are
     // of interest, so the last one can is simply ignored. The order is flipped, the last value
@@ -55,5 +57,5 @@ fn main() {
     // Normal vectors benchmark
     microbench::bench(&options, "add Vec3 optimized", || add_vec3_optimized(&a, &b, &mut add_result_optimized));
 
-    microbench::bench(&options, "add pure floats in __m128", || add_float(&a_reg, &b_reg));
+    microbench::bench(&options, "add pure floats in __m128", || add_float(&a_reg, &b_reg,result_reg));
 }
